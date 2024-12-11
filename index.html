@@ -16,16 +16,17 @@
         import { default as ExcelJS } from "./exceljs.1.8.0.esm.min.js";
         import { default as CodeGenerator } from "./code-generator.js";
         const workbook = new ExcelJS.Workbook();
-        
-        try {
-            const excelFile = await workbook.xlsx.load(
+        const excelFile = await workbook.xlsx.load(
                 await (
-                    await fetch ("./examples/ohms-law.xlsx")
+                    await fetch ("./examples/asd.xlsx")
                 )
                 .arrayBuffer()
             );
 
-            const worksheet = excelFile.getWorksheet('Sheet1');
+        const worksheet = excelFile.getWorksheet('aaa');
+
+        try {
+
             const lineHeader = 1;
             const lineToLearn = 2;
 
@@ -42,17 +43,29 @@
                 rowDataForHyperformula.push(cellData);
             });
 
+            const getCellText = cell => {
+                if (!!cell.value.richText) {
+                    return cell.value.richText.reduce((p, c) => p.text.replaceAll('\n', '') + c.text.replaceAll('\n', ''))
+                } else {
+                    return `${cell.value}`.replaceAll('\n', '')
+                }
+            }
+
             let fields = [];
             worksheet
             .getRow(lineHeader)
             .eachCell((headerCurrentCell, i) => {
                 const cell = worksheet.getRow(lineToLearn).getCell(i);
                 // cell.value.formula ? `=${cell.value.formula}` : cell.value;
+                console.log(`${cell.address}, ${i}`);
+                if (i == 30) {
+                    debugger;
+                }
                 const field = {
-                    name: headerCurrentCell.value,
+                    name: getCellText(headerCurrentCell),
                     commentForName: cell.address,
-                    readonly: !!cell.value.formula,
-                    formula: cell.value.formula
+                    readonly: !!cell.value && !!cell.value.formula,
+                    formula: !!cell.value && !!cell.value.formula ? cell.value.formula : null
                 };
                 fields.push(field);
             });
