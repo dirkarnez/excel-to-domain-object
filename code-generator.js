@@ -1,25 +1,34 @@
-`
-class DomainObject
+export default fields => `class DomainObject
 {
-    private $voltage;
-    private $current;
-    private $resistance;
+${fields
+    .map(field => {
+        return `\tprivate ${field.name};`;
+    })
+    .join("\n")
+}
 
-    public function __construct($voltageIn = null, $currentIn = null, $resistanceIn = null)
-    {
-        $this->voltage = $voltage;
-        $this->current = $current;
-        $this->resistance = $resistance;
-    }
+${fields
+    .filter(field => !!field.readonly)
+    .map(field => {
+        return `\tprivate function calculate_${field.name}() {\n\t};\n`;
+    })
+    .join("\n")
+}
 
-    public function calculateX()
-    {
+${fields
+    .filter(field => !!field.readonly)
+    .map(field => {
+        return `\tprivate function get_${field.name}() {\n\t};\n`;
+    })
+    .join("\n")
+}
 
-    }
-
-    public function setVoltage($voltage)
-    {
-        $this->voltage = $voltage;
-    }
+${fields
+    .filter(field => !field.readonly)
+    .map(field => {
+        return `\tprivate function set_${field.name}() {\n \t\t// trigger here \n\t};\n`;
+    })
+    .join("\n")
+}
 }
 `;

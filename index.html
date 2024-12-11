@@ -14,6 +14,7 @@
 
     <script type="module">
         import { default as ExcelJS } from "./exceljs.1.8.0.esm.min.js";
+        import { default as CodeGenerator } from "./code-generator.js";
         const workbook = new ExcelJS.Workbook();
         
         try {
@@ -25,22 +26,47 @@
             );
 
             const worksheet = excelFile.getWorksheet('Sheet1');
-            const lineToLearn = 'A';
+            const lineHeader = 1;
+            const lineToLearn = 2;
 
-            const cellFormula2 = worksheet.getCell("A2").formula;
-            const cellFormula3 = worksheet.getCell("B2").formula;
+            // Array(worksheet.getRow(lineToLearn).actualCellCount)
+            // .fill(NaN)
+            // .map((_, index) => {
+            //     worksheet.getRow(lineToLearn).getCell(1).value
+            // })
+
+            // if has formula, they are readonly, else setter
+            let rowDataForHyperformula = [];
+            worksheet.getRow(lineToLearn).eachCell((cell) => {
+                const cellData = cell.value.formula ? `=${cell.value.formula}` : cell.value;
+                rowDataForHyperformula.push(cellData);
+            });
+
+            let fields = [];
+            worksheet
+            .getRow(lineHeader)
+            .eachCell((headerCurrentCell, i) => {
+                const cell = worksheet.getRow(lineToLearn).getCell(i);
+                // cell.value.formula ? `=${cell.value.formula}` : cell.value;
+
+                const field = {
+                    name: headerCurrentCell.value,
+                    readonly: !!cell.value.formula,
+                    formula: cell.value.formula
+                };
+                fields.push(field);
+            });
+
+
+            console.log(CodeGenerator(fields));
 
             // worksheet.getCell("A2").formulaType === Excel.Enums.FormulaType.Master;
-            console.log(worksheet.getCell("A2").formulaType === ExcelJS.Enums.FormulaType.Master);
+            // console.log(worksheet.getCell("A2").formulaType === ExcelJS.FormulaType.Master);
 
-            debugger;
+        
         } catch (e) {
             debugger;
         }
-
-        debugger;
-
-        
 
         debugger;
     </script>
