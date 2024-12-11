@@ -48,9 +48,9 @@
             .eachCell((headerCurrentCell, i) => {
                 const cell = worksheet.getRow(lineToLearn).getCell(i);
                 // cell.value.formula ? `=${cell.value.formula}` : cell.value;
-
                 const field = {
                     name: headerCurrentCell.value,
+                    commentForName: cell.address,
                     readonly: !!cell.value.formula,
                     formula: cell.value.formula
                 };
