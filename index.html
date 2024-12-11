@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+    <!-- <script>
+        (() => {
+            //fetch("./examples/ohms-law.xlsx")
+            
+        })();
+    </script> -->
+
+    <script type="module">
+        import { default as ExcelJS } from "./exceljs.1.8.0.esm.min.js";
+        const workbook = new ExcelJS.Workbook();
+        
+        try {
+            const excelFile = await workbook.xlsx.load(
+                await (
+                    await fetch ("./examples/ohms-law.xlsx")
+                )
+                .arrayBuffer()
+            );
+
+            const worksheet = excelFile.getWorksheet('Sheet1');
+            const lineToLearn = 'A';
+
+            const cellFormula2 = worksheet.getCell("A2").formula;
+            const cellFormula3 = worksheet.getCell("B2").formula;
+
+            // worksheet.getCell("A2").formulaType === Excel.Enums.FormulaType.Master;
+            console.log(worksheet.getCell("A2").formulaType === ExcelJS.Enums.FormulaType.Master);
+
+            debugger;
+        } catch (e) {
+            debugger;
+        }
+
+        debugger;
+
+        
+
+        debugger;
+    </script>
+</body>
+</html>
