@@ -13,8 +13,75 @@
     </script> -->
 
     <script type="module">
-        import { default as hyperFormula } from "./hyperformula.2.7.1.esm.min.js";
+        import { default as HyperFormula } from "./hyperformula.2.7.1.esm.min.js";
+
+        HyperFormula.buildFromArray([[]]).calculateFormula('=1+10', 0);
+
+        // const sheetData = [
+        //     ['0', '=SUM(1, 2, 3)', '52'],
+        //     ['=SUM(A1:C1)', '', '=A1'],
+        //     ['2', '=SUM(A1:C1)', '91'],
+        // ];
+
+        // // method with optional config parameter maxColumns
+        // const hfInstance = HyperFormula.buildFromArray(sheetData, { maxColumns: 1000 });
+
+        // hfInstance.getCellDependents({ sheet: 0, col: 0, row: 0 })
+
+
+        const hfInstance = HyperFormula.buildFromSheets({
+            Sheet1: [
+                ['58', '29', '=A1+B1']
+            ],
+            Sheet2: [
+                ['1', '2', '3'], 
+                ['4', '5', '6']
+            ]
+        }, 
+        {
+            licenseKey: 'gpl-v3',
+            functionPlugins: [
+                class SumWithExtra extends HyperFormula.FunctionPlugin {
+                    static implementedFunctions = {
+                        'SUM': {
+                        method: 'sum',
+                        }
+                    }
+
+                    static aliases = {
+                        'SUMALIAS': 'SUM',
+                    }
+
+                    sum(ast, state) {
+                        debugger;
+                        //const left = this.evaluateAst(ast.args[0], state);
+                        //const right = this.evaluateAst(ast.args[1], state);
+                        //return 42 + left + right
+                        return 123456;
+                    }
+                }
+            ]
+        });
+
+
+        // returns the calculated formula's value
+        // for this example, returns `68`
+        // calculateFormula(formulaString: string, sheetId: number)
+        const calculatedFormulaWithSheetName = hfInstance.calculateFormula('=Sheet1!A1+Sheet2!B1', 0); // 58 + 2
+        const calculatedFormulaWithoutSheetName1 = hfInstance.calculateFormula('=A1+B1', 0); // 58 + 29
+        const calculatedFormulaWithoutSheetName2 = hfInstance.calculateFormula('=SUM(A1:B1)', 0); // 58 + 29
+        const cellPrecedents = hfInstance.getCellPrecedents({ sheet: 0, col: 2, row: 0}); // '=A1+B1'
         debugger;
+
+        // for this example, returns [['11', '12', '13'], ['14', '15', '16']]
+        // const calculatedFormula = hfInstance.calculateFormula('=A1:B3+10', 1);
+
+
+
+        // import { BaseRegExpVisitor } from "https://cdn.jsdelivr.net/npm/regexp-to-ast@0.4.0/+esm";
+        // import { ParserWithCaching } from "https://cdn.jsdelivr.net/npm/hyperformula@2.7.1/+esm";
+         debugger;
+        
         /*
     const parser = buildEmptyParserWithCaching(new Config())
 
@@ -88,6 +155,7 @@ export function buildEmptyParserWithCaching(config: Config, sheetMapping?: Sheet
                 if (i == 30) {
                     debugger;
                 }
+                //  hfInstance.doesCellHaveFormula
                 const field = {
                     name: getCellText(headerCurrentCell),
                     commentForName: cell.address,
