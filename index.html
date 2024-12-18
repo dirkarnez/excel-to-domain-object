@@ -104,6 +104,7 @@ export function buildEmptyParserWithCaching(config: Config, sheetMapping?: Sheet
 
     </script>
     <script type="module">
+        import { default as HyperFormula } from "./hyperformula.2.7.1.esm.min.js";
         import { default as ExcelJS } from "./exceljs.1.8.0.esm.min.js";
         import { default as CodeGenerator } from "./code-generator.js";
 
@@ -114,6 +115,29 @@ export function buildEmptyParserWithCaching(config: Config, sheetMapping?: Sheet
             }
             reader.readAsArrayBuffer(file)
         });
+
+        function convertXlsxWorkbookToJavascriptObject(workbook) {
+            const workbookData = {};
+
+            workbook.eachSheet((worksheet) => {
+                const sheetData = [];
+
+                worksheet.eachRow((row) => {
+                const rowData = [];
+
+                row.eachCell((cell) => {
+                    const cellData = cell.value.formula ? `=${cell.value.formula}` : cell.value;
+                    rowData.push(cellData);
+                });
+
+                sheetData.push(rowData);
+                });
+
+                workbookData[worksheet.name] = sheetData;
+            })
+
+            return workbookData;
+        }
 
         const inputElement = document.getElementById("input");
         inputElement.addEventListener("change", function () {
@@ -129,23 +153,26 @@ export function buildEmptyParserWithCaching(config: Config, sheetMapping?: Sheet
                         .map(arrayBuffer => (
                             new ExcelJS.Workbook().xlsx.load(arrayBuffer)
                         )))
-                )).then(excelFileList => {
-                    excelFileList.reduce()
+                )).then(excelFileList => (
+                    excelFileList
+                        .map(excelFile => (
+                            convertXlsxWorkbookToJavascriptObject(excelFile)
+                        ))
+                )).then(sheetsAsJavascriptObjectList => {
+                    const flattened = sheetsAsJavascriptObjectList.reduce((p, c) => {
+                        // sheet name clash may happen
+                        return ({...p, ...c})
+                    }, {});
+
+                    const hf = HyperFormula.buildFromSheets(flattened, { licenseKey: 'gpl-v3' });
+
                 });
         }, false);
 
-        const workbook = new ExcelJS.Workbook();
-        const excelFile = await workbook.xlsx.load(
-                // await (
-                //     await fetch ("./examples/asd.xlsx")
-                // )
-                // .arrayBuffer()
-            );
 
-        const worksheet = excelFile.getWorksheet('aaa');
+        // const worksheet = excelFile.getWorksheet('aaa');
 
         try {
-
             const lineHeader = 1;
             const lineToLearn = 2;
 
