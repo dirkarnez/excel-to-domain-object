@@ -116,6 +116,7 @@ export function buildEmptyParserWithCaching(config: Config, sheetMapping?: Sheet
             reader.readAsArrayBuffer(file)
         });
 
+        // https://hyperformula.handsontable.com/guide/file-import.html#import-xlsx-files
         function convertXlsxWorkbookToJavascriptObject(workbook) {
             const workbookData = {};
 
