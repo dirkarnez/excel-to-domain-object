@@ -11,8 +11,7 @@
             
         })();
     </script> -->
-    
-
+    <input type="file" id="input" multiple>
     <script type="module">
         import { default as HyperFormula } from "./hyperformula.2.7.1.esm.min.js";
         // const sheetData = [
@@ -107,12 +106,35 @@ export function buildEmptyParserWithCaching(config: Config, sheetMapping?: Sheet
     <script type="module">
         import { default as ExcelJS } from "./exceljs.1.8.0.esm.min.js";
         import { default as CodeGenerator } from "./code-generator.js";
+
+        const readAsArrayBufferPromise = file => new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                resolve(event.target.result)
+            }
+            reader.readAsArrayBuffer(file)
+        });
+
+        const inputElement = document.getElementById("input");
+        inputElement.addEventListener("change", function () {
+        const fileList = this.files;
+            Promise
+            .all(
+                Array
+                .from(fileList)
+                .map(file => readAsArrayBufferPromise(file)))
+            .then(arrayBuffers => {
+                globalObj = obj;
+                console.table(globalObj);
+            });
+        }, false);
+
         const workbook = new ExcelJS.Workbook();
         const excelFile = await workbook.xlsx.load(
-                await (
-                    await fetch ("./examples/asd.xlsx")
-                )
-                .arrayBuffer()
+                // await (
+                //     await fetch ("./examples/asd.xlsx")
+                // )
+                // .arrayBuffer()
             );
 
         const worksheet = excelFile.getWorksheet('aaa');
