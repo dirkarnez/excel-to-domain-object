@@ -172,7 +172,26 @@ export function buildEmptyParserWithCaching(config: Config, sheetMapping?: Sheet
                     }, {});
 
                     const hf = HyperFormula.buildFromSheets(flattened, { licenseKey: 'gpl-v3' });
-
+                    const sheetId = hf.getSheetId('Sheet1');
+                    const sheetValues = hf.getSheetValues(sheetId);
+                    try {
+                        const lineHeader = 0;
+                        const lineToLearn = 1;
+                        sheetValues[lineHeader].map((headerCell, i) => {
+                            const formula = hf.getCellFormula({ sheet: sheetId, col: i, row: lineToLearn });
+                            if (!!formula) {
+                                console.log(`${headerCell} ${formula}`)
+                            } else {
+                                const value = hf.getCellValue({ sheet: sheetId, col: i, row: lineHeader });
+                                console.log(`${headerCell} ${value}`)
+                            }
+                            // const valueCell =  sheetValues[lineToLearn][i];
+                            
+                        })
+                    } catch (e) {
+                        console.error(e);
+                    }
+                     
                 });
         }, false);
 
@@ -211,9 +230,6 @@ export function buildEmptyParserWithCaching(config: Config, sheetMapping?: Sheet
                 const cell = worksheet.getRow(lineToLearn).getCell(i);
                 // cell.value.formula ? `=${cell.value.formula}` : cell.value;
                 console.log(`${cell.address}, ${i}`);
-                if (i == 30) {
-                    debugger;
-                }
                 //  hfInstance.doesCellHaveFormula
                 const field = {
                     name: getCellText(headerCurrentCell),
