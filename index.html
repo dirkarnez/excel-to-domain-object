@@ -199,7 +199,7 @@ export function buildEmptyParserWithCaching(config: Config, sheetMapping?: Sheet
                             };
                             fields.push(field);
                         })
-                        console.log(CodeGenerator(fields));
+                        console.log(CodeGenerator(HyperFormula, fields));
                     } catch (e) {
                         console.error(e);
                     }

@@ -50,11 +50,19 @@ const ast = JSON.parse(`{
     }
 }`);
 
-const jsCode = generateCode(ast);
-console.log(jsCode);
+// const jsCode = generateCode(ast);
+// console.log(jsCode);
 
 
-export default fields => `class DomainObject
+const parseFormula = (HyperFormulaLibrary, formula) => {
+    const node = HyperFormulaLibrary.buildFromArray([[ `${formula}` ]]).graph.getNodes()[0];
+    if (!!node && !!node.formula) {
+        return generateCode(node.formula);
+    } else {
+        throw "Invalid formula"
+    }
+}
+export default (HyperFormulaLibrary, fields) => `class DomainObject
 {
 ${fields
     .map(field => {
@@ -66,7 +74,7 @@ ${fields
 ${fields
     .filter(field => !!field.readonly)
     .map(field => {
-        return `\tprivate function get_${field.name}() {\n\t\t// ${field.formula}\n\t\treturn ${field.formula}\n\t};\n`;
+        return `\tprivate function get${field.name}() {\n\t\t// ${field.formula}\n\t\treturn ${parseFormula(HyperFormulaLibrary, field.formula)}\n\t};\n`;
     })
     .join("\n")
 }
@@ -74,7 +82,7 @@ ${fields
     .filter(field => !field.readonly)
     .map(field => {
         const param = `$${field.name}In`;
-        return `\tprivate function set_${field.name}(${param}) {\n\t\t$this->${field.name} = ${param};\n\t};\n`;
+        return `\tprivate function set${field.name}(${param}) {\n\t\t$this->${field.name} = ${param};\n\t};\n`;
     })
     .join("\n")
 }}
