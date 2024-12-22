@@ -124,14 +124,14 @@ export function buildEmptyParserWithCaching(config: Config, sheetMapping?: Sheet
                 const sheetData = [];
 
                 worksheet.eachRow((row) => {
-                const rowData = [];
+                    const rowData = [];
 
-                row.eachCell((cell) => {
-                    const cellData = cell.value.formula ? `=${cell.value.formula}` : cell.value;
-                    rowData.push(cellData);
-                });
+                    row.eachCell((cell) => {
+                        const cellData = cell.value.formula ? `=${cell.value.formula}` : cell.value;
+                        rowData.push(cellData);
+                    });
 
-                sheetData.push(rowData);
+                    sheetData.push(rowData);
                 });
 
                 workbookData[worksheet.name] = sheetData;
@@ -155,14 +155,20 @@ export function buildEmptyParserWithCaching(config: Config, sheetMapping?: Sheet
                             new ExcelJS.Workbook().xlsx.load(arrayBuffer)
                         )))
                 )).then(excelFileList => (
-                    excelFileList
-                        .map(excelFile => (
-                            convertXlsxWorkbookToJavascriptObject(excelFile)
-                        ))
+                    excelFileList.map(excelFile => (
+                        convertXlsxWorkbookToJavascriptObject(excelFile)
+                    ))
                 )).then(sheetsAsJavascriptObjectList => {
                     const flattened = sheetsAsJavascriptObjectList.reduce((p, c) => {
                         // sheet name clash may happen
-                        return ({...p, ...c})
+                        const numberOfSheetCurrent = Object.keys(c).length;
+                        const numberOfSheetPrevious = Object.keys(p).length;
+                        const newObject = ({...p, ...c});
+                        if (Object.keys(newObject).length != numberOfSheetPrevious + numberOfSheetCurrent) {
+                            throw "Sheet name clash"
+                        } else {
+                            return newObject;
+                        }
                     }, {});
 
                     const hf = HyperFormula.buildFromSheets(flattened, { licenseKey: 'gpl-v3' });
