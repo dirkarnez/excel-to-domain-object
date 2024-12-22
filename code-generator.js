@@ -1,8 +1,12 @@
-function getCellValue(row, col) {
-    return `${row},${col}`
+function address(HyperFormulaLibrary, row, col) {
+    HyperFormulaLibrary.buildFromArray([[ ]], {licenseKey: 'gpl-v3'}).simpleCellAddressToString({  sheet: 0, col: col, row: row }, 0);
 }
 
-function generateCode(ast) {
+function getCellValue(HyperFormulaLibrary, row, col, fields) {
+    return fields.filter(field => field.commentForName == `${address(HyperFormulaLibrary, row, col)}`)[0].name
+}
+
+function generateCode(HyperFormulaLibrary, ast, fields) {
     switch (ast.type) {
         case 'DIV_OP':
             return `${generateCode(ast.left)} / ${generateCode(ast.right)}`;
@@ -13,7 +17,7 @@ function generateCode(ast) {
         case 'MINUS_OP':
             return `${generateCode(ast.left)} - ${generateCode(ast.right)}`;
         case 'CELL_REFERENCE':
-            return getCellValue(ast.reference.row, ast.reference.col); // Assumes a function getCellValue(row, col)
+            return getCellValue(HyperFormulaLibrary, ast.reference.row, ast.reference.col, fields); // Assumes a function getCellValue(row, col)
         case 'NUMBER':
             return ast.value.toString();
         case 'PARENTHESES':
@@ -54,10 +58,10 @@ const ast = JSON.parse(`{
 // console.log(jsCode);
 
 
-const parseFormula = (HyperFormulaLibrary, formula) => {
-    const node = HyperFormulaLibrary.buildFromArray([[ `${formula}` ]]).graph.getNodes()[0];
+const parseFormula = (HyperFormulaLibrary, formula, fields) => {
+    const node = HyperFormulaLibrary.buildFromArray([[ `${formula}` ]], {licenseKey: 'gpl-v3'}).graph.getNodes()[0];
     if (!!node && !!node.formula) {
-        return generateCode(node.formula);
+        return generateCode(node.formula, fields);
     } else {
         throw "Invalid formula"
     }
@@ -74,7 +78,7 @@ ${fields
 ${fields
     .filter(field => !!field.readonly)
     .map(field => {
-        return `\tprivate function get${field.name}() {\n\t\t// ${field.formula}\n\t\treturn ${parseFormula(HyperFormulaLibrary, field.formula)}\n\t};\n`;
+        return `\tprivate function get${field.name}() {\n\t\t// ${field.formula}\n\t\treturn ${parseFormula(HyperFormulaLibrary, field.formula, fields)}\n\t};\n`;
     })
     .join("\n")
 }
