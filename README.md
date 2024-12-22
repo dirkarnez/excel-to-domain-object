@@ -9,5 +9,6 @@
 ### TODOs
 - [ ] svelte form generation (`$state()` for form)
   - [dirkarnez/svelte-5-async-form](https://github.com/dirkarnez/svelte-5-async-form)
+- [ ] PHP api JSON serializable
 ### Tools
 - [hyperformula-parser-playground](https://dirkarnez.github.io/hyperformula-parser-playground/)
