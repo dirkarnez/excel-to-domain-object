@@ -1,5 +1,5 @@
 function address(HyperFormulaLibrary, row, col) {
-    HyperFormulaLibrary.buildFromArray([[ ]], {licenseKey: 'gpl-v3'}).simpleCellAddressToString({  sheet: 0, col: col, row: row }, 0);
+    return HyperFormulaLibrary.buildFromArray([[ ]], {licenseKey: 'gpl-v3'}).simpleCellAddressToString({  sheet: 0, col: col, row: row }, 0);
 }
 
 function getCellValue(HyperFormulaLibrary, row, col, fields) {
@@ -9,19 +9,19 @@ function getCellValue(HyperFormulaLibrary, row, col, fields) {
 function generateCode(HyperFormulaLibrary, ast, fields) {
     switch (ast.type) {
         case 'DIV_OP':
-            return `${generateCode(ast.left)} / ${generateCode(ast.right)}`;
+            return `${generateCode(HyperFormulaLibrary, ast.left, fields)} / ${generateCode(HyperFormulaLibrary, ast.right, fields)}`;
         case 'TIMES_OP':
-            return `${generateCode(ast.left)} * ${generateCode(ast.right)}`;
+            return `${generateCode(HyperFormulaLibrary, ast.left, fields)} * ${generateCode(HyperFormulaLibrary, ast.right, fields)}`;
         case 'PLUS_OP':
-            return `${generateCode(ast.left)} + ${generateCode(ast.right)}`;
+            return `${generateCode(HyperFormulaLibrary, ast.left, fields)} + ${generateCode(HyperFormulaLibrary, ast.right, fields)}`;
         case 'MINUS_OP':
-            return `${generateCode(ast.left)} - ${generateCode(ast.right)}`;
+            return `${generateCode(HyperFormulaLibrary, ast.left, fields)} - ${generateCode(HyperFormulaLibrary, ast.right, fields)}`;
         case 'CELL_REFERENCE':
             return getCellValue(HyperFormulaLibrary, ast.reference.row, ast.reference.col, fields); // Assumes a function getCellValue(row, col)
         case 'NUMBER':
             return ast.value.toString();
         case 'PARENTHESES':
-            return `(${generateCode(ast.expression)})`;
+            return `(${generateCode(HyperFormulaLibrary, ast.expression, fields)})`;
         default:
             throw new Error(`Unknown AST node type: ${ast.type}`);
     }
@@ -61,7 +61,7 @@ const ast = JSON.parse(`{
 const parseFormula = (HyperFormulaLibrary, formula, fields) => {
     const node = HyperFormulaLibrary.buildFromArray([[ `${formula}` ]], {licenseKey: 'gpl-v3'}).graph.getNodes()[0];
     if (!!node && !!node.formula) {
-        return generateCode(node.formula, fields);
+        return generateCode(HyperFormulaLibrary, node.formula, fields);
     } else {
         throw "Invalid formula"
     }
