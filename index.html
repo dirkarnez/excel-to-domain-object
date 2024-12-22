@@ -177,17 +177,29 @@ export function buildEmptyParserWithCaching(config: Config, sheetMapping?: Sheet
                     try {
                         const lineHeader = 0;
                         const lineToLearn = 1;
+                        
+                        let fields = [];
+
                         sheetValues[lineHeader].map((headerCell, i) => {
-                            const formula = hf.getCellFormula({ sheet: sheetId, col: i, row: lineToLearn });
-                            if (!!formula) {
+                            const lookForFormula = { sheet: sheetId, col: i, row: lineToLearn };
+                            if (!!hf.doesCellHaveFormula(lookForFormula)) {
+                                const formula = hf.getCellFormula(lookForFormula);
                                 console.log(`${headerCell} ${formula}`)
                             } else {
-                                const value = hf.getCellValue({ sheet: sheetId, col: i, row: lineHeader });
+                                const value = hf.getCellValue({ sheet: sheetId, col: i, row: lineToLearn });
                                 console.log(`${headerCell} ${value}`)
                             }
                             // const valueCell =  sheetValues[lineToLearn][i];
-                            
+
+                            const field = {
+                                name: hf.getCellValue({ sheet: sheetId, col: i, row: lineHeader }),
+                                commentForName: hf.simpleCellAddressToString({ sheet: sheetId, col: i, row: lineToLearn }, sheetId),
+                                readonly: hf.doesCellHaveFormula(lookForFormula),
+                                formula: hf.doesCellHaveFormula(lookForFormula) ? hf.getCellFormula(lookForFormula) : null
+                            };
+                            fields.push(field);
                         })
+                        console.log(CodeGenerator(fields));
                     } catch (e) {
                         console.error(e);
                     }
@@ -197,7 +209,7 @@ export function buildEmptyParserWithCaching(config: Config, sheetMapping?: Sheet
 
 
         // const worksheet = excelFile.getWorksheet('aaa');
-
+/*
         try {
             const lineHeader = 1;
             const lineToLearn = 2;
@@ -249,7 +261,7 @@ export function buildEmptyParserWithCaching(config: Config, sheetMapping?: Sheet
             debugger;
         }
 
-        debugger;
+        debugger;*/
     </script>
 </body>
 </html>

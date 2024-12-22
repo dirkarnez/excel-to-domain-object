@@ -66,7 +66,7 @@ ${fields
 ${fields
     .filter(field => !!field.readonly)
     .map(field => {
-        return `\tprivate function get_${field.name}() {\n\t\t// =${field.formula}\n\t\treturn ${field.formula}\n\t};\n`;
+        return `\tprivate function get_${field.name}() {\n\t\t// ${field.formula}\n\t\treturn ${field.formula}\n\t};\n`;
     })
     .join("\n")
 }
