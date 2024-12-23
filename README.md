@@ -6,10 +6,12 @@
   - [handsontable/hyperformula-demos](https://github.com/handsontable/hyperformula-demos)
     - [hyperformula-demos/svelte-demo at develop · handsontable/hyperformula-demos](https://github.com/handsontable/hyperformula-demos/tree/develop/svelte-demo)
 
+### Notes
+- Sheet name must be in English (Excel will automatically update related formulae referencing the renamed sheets)
+
 ### TODOs
 - [ ] svelte form generation (`$state()` for form)
   - [dirkarnez/svelte-5-async-form](https://github.com/dirkarnez/svelte-5-async-form)
-- [ ] Chinese sheet name mapping to english otherwise
 - [ ] function
   - [ ] `VLOOKUP`
   - [ ] `IFERROR`
