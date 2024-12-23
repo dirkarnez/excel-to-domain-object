@@ -71,7 +71,7 @@ const getterSetterCase = (fieldName) => {
     return `${fieldName.charAt(0).toUpperCase()}${fieldName.substring(1)}`
 }
 
-export default (HyperFormulaLibrary, fields) => `class DomainObject
+export default (HyperFormulaLibrary, fields) => `class DomainObject implements JsonSerializable
 {
 ${fields
     .map(field => {
@@ -83,7 +83,7 @@ ${fields
 ${fields
     .filter(field => !!field.readonly)
     .map(field => {
-        return `\tprivate function get${getterSetterCase(field.name)}() {\n\t\t// ${field.formula}\n\t\treturn ${parseFormula(HyperFormulaLibrary, field.formula, fields)};\n\t}\n`;
+        return `\tpublic function get${getterSetterCase(field.name)}() {\n\t\t// ${field.formula}\n\t\treturn ${parseFormula(HyperFormulaLibrary, field.formula, fields)};\n\t}\n`;
     })
     .join("\n")
 }
@@ -91,8 +91,18 @@ ${fields
     .filter(field => !field.readonly)
     .map(field => {
         const param = `$${field.name}In`;
-        return `\tprivate function set${getterSetterCase(field.name)}(${param}) {\n\t\t$this->${field.name} = ${param};\n\t}\n`;
+        return `\tpublic function get${getterSetterCase(field.name)}() {\n\t\treturn $this->${field.name};\n\t}\n\n\tpublic function set${getterSetterCase(field.name)}(${param}) {\n\t\t$this->${field.name} = ${param};\n\t}\n`;
     })
     .join("\n")
 }}
+
+\tpublic function jsonSerialize(): mixed {\n}\n
 `;
+
+
+// return array(
+//     "voltage" => $this->getVoltage(),
+//     "current" => $this->getCurrent(),
+//     "resistance" => $this->getResistance()
+//   );
+// }
