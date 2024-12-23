@@ -212,7 +212,10 @@ export function buildEmptyParserWithCaching(config: Config, sheetMapping?: Sheet
                             return newObject;
                         }
                     }, {});
-
+                    
+                    const lineHeader = 0;
+                    const lineToLearn = 1;
+                    
                     const hf = HyperFormula.buildFromSheets(flattened, { licenseKey: 'gpl-v3' });
                     const sheetId = hf.getSheetId('Sheet1');
                     const sheetValues = hf.getSheetValues(sheetId);
@@ -238,9 +241,6 @@ export function buildEmptyParserWithCaching(config: Config, sheetMapping?: Sheet
                     .then(text => {
                         
                         try {
-                            const lineHeader = 0;
-                            const lineToLearn = 1;
-                            
                             let mapping = JSON.parse(text);
 
                             if (sheetValues[lineHeader].length != mapping.length) {
