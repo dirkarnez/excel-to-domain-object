@@ -9,6 +9,14 @@
 ### TODOs
 - [ ] svelte form generation (`$state()` for form)
   - [dirkarnez/svelte-5-async-form](https://github.com/dirkarnez/svelte-5-async-form)
+- [ ] Chinese sheet name mapping to english otherwise
+- [ ] function
+  - [ ] `VLOOKUP`
+  - [ ] `IFERROR`
+  - [ ] `COLUMN()`
+  - [ ] `FALSE()`
+- [ ] Range to fields array
+- [ ] Table references
 - [ ] PHP api JSON serializable
 ### Tools
 - [hyperformula-parser-playground](https://dirkarnez.github.io/hyperformula-parser-playground/)
