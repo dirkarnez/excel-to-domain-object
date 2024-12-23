@@ -145,10 +145,14 @@ export function buildEmptyParserWithCaching(config: Config, sheetMapping?: Sheet
         }
 
         const getCellText = cell => {
-            if (!!cell.value.richText) {
-                return cell.value.richText.reduce((p, c) => p.text.replaceAll('\n', '') + c.text.replaceAll('\n', ''))
+            if (!!cell.value) {
+                if (!!cell.value.richText) {
+                    return cell.value.richText.reduce((p, c) => p.text.replaceAll('\n', '') + c.text.replaceAll('\n', ''))
+                } else {
+                    return `${cell.value}`.replaceAll('\n', '')
+                }
             } else {
-                return `${cell.value}`.replaceAll('\n', '')
+                return ``;
             }
         }
         
