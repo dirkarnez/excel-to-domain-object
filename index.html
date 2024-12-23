@@ -144,6 +144,14 @@ export function buildEmptyParserWithCaching(config: Config, sheetMapping?: Sheet
             document.body.removeChild(a);
         }
 
+        const getCellText = cell => {
+            if (!!cell.value.richText) {
+                return cell.value.richText.reduce((p, c) => p.text.replaceAll('\n', '') + c.text.replaceAll('\n', ''))
+            } else {
+                return `${cell.value}`.replaceAll('\n', '')
+            }
+        }
+        
         // https://hyperformula.handsontable.com/guide/file-import.html#import-xlsx-files
         function convertXlsxWorkbookToJavascriptObject(workbook) {
             const workbookData = {};
@@ -155,7 +163,7 @@ export function buildEmptyParserWithCaching(config: Config, sheetMapping?: Sheet
                     const rowData = [];
 
                     row.eachCell((cell) => {
-                        const cellData = cell.value && cell.value.formula ? `=${cell.value.formula}` : cell.value;
+                        const cellData = cell.value && cell.value.formula ? `=${cell.value.formula}` : getCellText(cell);
                         rowData.push(cellData);
                     });
 
