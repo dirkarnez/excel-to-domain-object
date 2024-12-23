@@ -155,7 +155,7 @@ export function buildEmptyParserWithCaching(config: Config, sheetMapping?: Sheet
                     const rowData = [];
 
                     row.eachCell((cell) => {
-                        const cellData = cell.value.formula ? `=${cell.value.formula}` : cell.value;
+                        const cellData = cell.value && cell.value.formula ? `=${cell.value.formula}` : cell.value;
                         rowData.push(cellData);
                     });
 
