@@ -94,15 +94,7 @@ ${fields
         return `\tpublic function get${getterSetterCase(field.name)}() {\n\t\treturn $this->${field.name};\n\t}\n\n\tpublic function set${getterSetterCase(field.name)}(${param}) {\n\t\t$this->${field.name} = ${param};\n\t}\n`;
     })
     .join("\n")
-}}
-
-\tpublic function jsonSerialize(): mixed {\n}\n
+}\n\tpublic function jsonSerialize(): mixed {\n\t\treturn array(\n${fields.map(field => { 
+    return `\t\t\t"${field.name}" => $this->get${getterSetterCase(field.name)}()`
+}).join(",\n")}\n\t\t);\n\t}\n}\n
 `;
-
-
-// return array(
-//     "voltage" => $this->getVoltage(),
-//     "current" => $this->getCurrent(),
-//     "resistance" => $this->getResistance()
-//   );
-// }
