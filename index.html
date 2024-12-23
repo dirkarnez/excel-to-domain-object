@@ -11,7 +11,10 @@
             
         })();
     </script> -->
+    <input type="file" id="mapping">
+    <br>
     <input type="file" id="input" multiple>
+
     <script type="module">
         import { default as HyperFormula } from "./hyperformula.2.7.1.esm.min.js";
         // const sheetData = [
@@ -38,25 +41,25 @@
         {
             licenseKey: 'gpl-v3',
             functionPlugins: [
-                class SumWithExtra extends HyperFormula.FunctionPlugin {
-                    static implementedFunctions = {
-                        'SUM': {
-                        method: 'sum',
-                        }
-                    }
+                // class SumWithExtra extends HyperFormula.FunctionPlugin {
+                //     static implementedFunctions = {
+                //         'SUM': {
+                //         method: 'sum',
+                //         }
+                //     }
 
-                    static aliases = {
-                        'SUMALIAS': 'SUM',
-                    }
+                //     static aliases = {
+                //         'SUMALIAS': 'SUM',
+                //     }
 
-                    sum(ast, state) {
-                        debugger;
-                        //const left = this.evaluateAst(ast.args[0], state);
-                        //const right = this.evaluateAst(ast.args[1], state);
-                        //return 42 + left + right
-                        return 123456;
-                    }
-                }
+                //     sum(ast, state) {
+                //         debugger;
+                //         //const left = this.evaluateAst(ast.args[0], state);
+                //         //const right = this.evaluateAst(ast.args[1], state);
+                //         //return 42 + left + right
+                //         return 123456;
+                //     }
+                // }
             ]
         });
 
@@ -68,17 +71,11 @@
         const calculatedFormulaWithoutSheetName1 = hfInstance.calculateFormula('=A1+B1', 0); // 58 + 29
         const calculatedFormulaWithoutSheetName2 = hfInstance.calculateFormula('=SUM(A1:B1)', 0); // 58 + 29
         const cellPrecedents = hfInstance.getCellPrecedents({ sheet: 0, col: 2, row: 0}); // '=A1+B1'
-        debugger;
+
 
         // for this example, returns [['11', '12', '13'], ['14', '15', '16']]
         // const calculatedFormula = hfInstance.calculateFormula('=A1:B3+10', 1);
 
-
-
-        // import { BaseRegExpVisitor } from "https://cdn.jsdelivr.net/npm/regexp-to-ast@0.4.0/+esm";
-        // import { ParserWithCaching } from "https://cdn.jsdelivr.net/npm/hyperformula@2.7.1/+esm";
-         debugger;
-        
         /*
     const parser = buildEmptyParserWithCaching(new Config())
 
@@ -115,6 +112,21 @@ export function buildEmptyParserWithCaching(config: Config, sheetMapping?: Sheet
             }
             reader.readAsArrayBuffer(file)
         });
+
+        const downloadString = (text, fileType, fileName) => {
+            const a = document.createElement('a');
+            a.download = fileName;
+            a.href = URL.createObjectURL(new Blob([text], { type: fileType }));
+            a.dataset.downloadurl = [fileType, a.download, a.href].join(':');
+            a.style.display = "none";
+            document.body.appendChild(a);
+        
+            a.addEventListener("click", () => {
+                setTimeout(function() { URL.revokeObjectURL(a.href); }, 0);
+            })
+            a.click();
+            document.body.removeChild(a);
+        }
 
         // https://hyperformula.handsontable.com/guide/file-import.html#import-xlsx-files
         function convertXlsxWorkbookToJavascriptObject(workbook) {
@@ -179,6 +191,20 @@ export function buildEmptyParserWithCaching(config: Config, sheetMapping?: Sheet
                         const lineToLearn = 1;
                         
                         let fields = [];
+
+                        if (!document.getElementById("mapping").files[0]) {
+                            downloadString(JSON.stringify(sheetValues[lineHeader]
+                                .map((headerCell, i) => {
+                                    return ({
+                                        header_name: `${headerCell}`,
+                                        variable_name: ``
+                                    });
+                                }), null, 4),
+                                "application/json",
+                                "mapping.json"
+                            )
+                            return
+                        }
 
                         sheetValues[lineHeader].map((headerCell, i) => {
                             const lookForFormula = { sheet: sheetId, col: i, row: lineToLearn };

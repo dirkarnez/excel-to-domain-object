@@ -1,0 +1,14 @@
+[
+    {
+        "header_name": "V",
+        "variable_name": "voltage"
+    },
+    {
+        "header_name": "I",
+        "variable_name": "current"
+    },
+    {
+        "header_name": "R",
+        "variable_name": "Resistance"
+    }
+]
