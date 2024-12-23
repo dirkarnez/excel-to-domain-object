@@ -32,7 +32,7 @@ function generateCode(HyperFormulaLibrary, ast, fields) {
             return ast.value.toString();
         case 'PARENTHESES':
             return `(${generateCode(HyperFormulaLibrary, ast.expression, fields)})`;
-        case 'ERROR_WITH_RAW_INPUT'
+        case 'ERROR_WITH_RAW_INPUT':
             return ast.rawInput;
         default:
             throw new Error(`Unknown AST node type: ${ast.type}`);
