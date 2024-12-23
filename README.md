@@ -13,7 +13,7 @@
 - [ ] svelte form generation (`$state()` for form)
   - [dirkarnez/svelte-5-async-form](https://github.com/dirkarnez/svelte-5-async-form)
 - [ ] function
-  - [ ] `VLOOKUP`
+  - [ ] `VLOOKUP(value_to_equal, ranges, column of data to return related to ranges)`
   - [ ] `IFERROR(value, value_if_error)`
   - [ ] `COLUMN()` get current column the current cell locates
   - [ ] `FALSE()` set cell to logical false
