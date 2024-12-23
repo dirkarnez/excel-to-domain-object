@@ -75,7 +75,7 @@ const parseFormula = (HyperFormulaLibrary, formula, fields) => {
     if (!!node && !!node.formula) {
         return generateCode(HyperFormulaLibrary, node.formula, fields);
     } else {
-        throw `Invalid formula ${formula}`
+        return `[unsupported formula ${formula}]`
     }
 }
 
