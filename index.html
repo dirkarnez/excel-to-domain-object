@@ -11,9 +11,16 @@
             
         })();
     </script> -->
-    <input type="file" id="mapping">
+    <label>mapping.json (leave empty if do not have)
+        <input type="file" id="mapping">
+    </label>
     <br>
-    <input type="file" id="input" multiple>
+    <label>the excel
+        <input type="file" id="input" multiple>
+    </label>
+    <br>
+    <input type="checkbox" id="php" value="PHP" checked="true" disabled="true">
+    <label for="php">PHP</label>
 
     <script type="module">
         import { default as HyperFormula } from "./hyperformula.2.7.1.esm.min.js";
@@ -113,6 +120,15 @@ export function buildEmptyParserWithCaching(config: Config, sheetMapping?: Sheet
             reader.readAsArrayBuffer(file)
         });
 
+        const readAsTextPromise = file => new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                resolve(event.target.result)
+            }
+            reader.readAsText(file)
+        });
+
+
         const downloadString = (text, fileType, fileName) => {
             const a = document.createElement('a');
             a.download = fileName;
@@ -186,50 +202,77 @@ export function buildEmptyParserWithCaching(config: Config, sheetMapping?: Sheet
                     const hf = HyperFormula.buildFromSheets(flattened, { licenseKey: 'gpl-v3' });
                     const sheetId = hf.getSheetId('Sheet1');
                     const sheetValues = hf.getSheetValues(sheetId);
-                    try {
-                        const lineHeader = 0;
-                        const lineToLearn = 1;
-                        
-                        let fields = [];
 
-                        if (!document.getElementById("mapping").files[0]) {
-                            downloadString(JSON.stringify(sheetValues[lineHeader]
-                                .map((headerCell, i) => {
-                                    return ({
-                                        header_name: `${headerCell}`,
-                                        variable_name: ``
-                                    });
-                                }), null, 4),
-                                "application/json",
-                                "mapping.json"
-                            )
-                            return
-                        }
+                    const mappingFileInput = document.getElementById("mapping");
+                    const mappingFile = mappingFileInput.files[0];
 
-                        sheetValues[lineHeader].map((headerCell, i) => {
-                            const lookForFormula = { sheet: sheetId, col: i, row: lineToLearn };
-                            if (!!hf.doesCellHaveFormula(lookForFormula)) {
-                                const formula = hf.getCellFormula(lookForFormula);
-                                console.log(`${headerCell} ${formula}`)
-                            } else {
-                                const value = hf.getCellValue({ sheet: sheetId, col: i, row: lineToLearn });
-                                console.log(`${headerCell} ${value}`)
-                            }
-                            // const valueCell =  sheetValues[lineToLearn][i];
-
-                            const field = {
-                                name: hf.getCellValue({ sheet: sheetId, col: i, row: lineHeader }),
-                                commentForName: hf.simpleCellAddressToString({ sheet: sheetId, col: i, row: lineToLearn }, sheetId),
-                                readonly: hf.doesCellHaveFormula(lookForFormula),
-                                formula: hf.doesCellHaveFormula(lookForFormula) ? hf.getCellFormula(lookForFormula) : null
-                            };
-                            fields.push(field);
-                        })
-                        console.log(CodeGenerator(HyperFormula, fields));
-                    } catch (e) {
-                        console.error(e);
+                    if (!mappingFile) {
+                        downloadString(JSON.stringify(sheetValues[lineHeader]
+                            .map((headerCell, i) => {
+                                return ({
+                                    header_name: `${headerCell}`,
+                                    variable_name: ``
+                                });
+                            }), null, 4),
+                            "application/json",
+                            "mapping.json"
+                        )
+                        return
                     }
-                     
+
+                    readAsTextPromise(mappingFile)
+                    .then(text => {
+                        
+                        try {
+                            const lineHeader = 0;
+                            const lineToLearn = 1;
+                            
+                            let mapping = JSON.parse(text);
+
+                            if (sheetValues[lineHeader].length != mapping.length) {
+                                throw "mapping does not match excel header";
+                            }
+
+                            let fields = [];
+
+                            sheetValues[lineHeader].map((headerCell, i) => {
+                                const lookForFormula = { sheet: sheetId, col: i, row: lineToLearn };
+                                if (!!hf.doesCellHaveFormula(lookForFormula)) {
+                                    const formula = hf.getCellFormula(lookForFormula);
+                                    console.log(`${headerCell} ${formula}`)
+                                } else {
+                                    const value = hf.getCellValue({ sheet: sheetId, col: i, row: lineToLearn });
+                                    console.log(`${headerCell} ${value}`)
+                                }
+                                // const valueCell =  sheetValues[lineToLearn][i];
+
+                                const headerName = hf.getCellValue({ sheet: sheetId, col: i, row: lineHeader });
+
+                                const variableName = mapping[i]["header_name"] == headerName ? mapping[i]["variable_name"].toLowerCase() : undefined;
+
+                                if (!variableName) {
+                                    throw `no mapping for ${headerName}`;
+                                }
+                                
+                                const field = {
+                                    name: variableName,
+                                    commentForName: hf.simpleCellAddressToString({ sheet: sheetId, col: i, row: lineToLearn }, sheetId),
+                                    readonly: hf.doesCellHaveFormula(lookForFormula),
+                                    formula: hf.doesCellHaveFormula(lookForFormula) ? hf.getCellFormula(lookForFormula) : null
+                                };
+                                fields.push(field);
+                            })
+
+                            downloadString(
+                                CodeGenerator(HyperFormula, fields),
+                                "text/plain",
+                                "DomainObject.php"
+                            )
+                            
+                        } catch (e) {
+                            console.error(e);
+                        }
+                    });
                 });
         }, false);
 

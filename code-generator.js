@@ -3,7 +3,7 @@ function address(HyperFormulaLibrary, row, col) {
 }
 
 function getCellValue(HyperFormulaLibrary, row, col, fields) {
-    return fields.filter(field => field.commentForName == `${address(HyperFormulaLibrary, row, col)}`)[0].name
+    return `$this->${fields.filter(field => field.commentForName == `${address(HyperFormulaLibrary, row, col)}`)[0].name}`;
 }
 
 function generateCode(HyperFormulaLibrary, ast, fields) {
@@ -66,11 +66,16 @@ const parseFormula = (HyperFormulaLibrary, formula, fields) => {
         throw "Invalid formula"
     }
 }
+
+const getterSetterCase = (fieldName) => {
+    return `${fieldName.charAt(0).toUpperCase()}${fieldName.substring(1)}`
+}
+
 export default (HyperFormulaLibrary, fields) => `class DomainObject
 {
 ${fields
     .map(field => {
-        return `\tprivate ${field.name}; // ${field.commentForName}`;
+        return `\tprivate $${field.name}; // ${field.commentForName}`;
     })
     .join("\n")
 }
@@ -78,7 +83,7 @@ ${fields
 ${fields
     .filter(field => !!field.readonly)
     .map(field => {
-        return `\tprivate function get${field.name}() {\n\t\t// ${field.formula}\n\t\treturn ${parseFormula(HyperFormulaLibrary, field.formula, fields)}\n\t};\n`;
+        return `\tprivate function get${getterSetterCase(field.name)}() {\n\t\t// ${field.formula}\n\t\treturn ${parseFormula(HyperFormulaLibrary, field.formula, fields)};\n\t}\n`;
     })
     .join("\n")
 }
@@ -86,7 +91,7 @@ ${fields
     .filter(field => !field.readonly)
     .map(field => {
         const param = `$${field.name}In`;
-        return `\tprivate function set${field.name}(${param}) {\n\t\t$this->${field.name} = ${param};\n\t};\n`;
+        return `\tprivate function set${getterSetterCase(field.name)}(${param}) {\n\t\t$this->${field.name} = ${param};\n\t}\n`;
     })
     .join("\n")
 }}
