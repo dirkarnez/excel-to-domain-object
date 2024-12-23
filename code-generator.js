@@ -6,6 +6,16 @@ function getCellValue(HyperFormulaLibrary, row, col, fields) {
     return `$this->${fields.filter(field => field.commentForName == `${address(HyperFormulaLibrary, row, col)}`)[0].name}`;
 }
 
+/*
+{
+    "type": "ERROR_WITH_RAW_INPUT",
+    "error": {
+        "type": "REF"
+    },
+    "rawInput": "Sheet14!A1"
+}
+*/
+
 function generateCode(HyperFormulaLibrary, ast, fields) {
     switch (ast.type) {
         case 'DIV_OP':
@@ -22,6 +32,8 @@ function generateCode(HyperFormulaLibrary, ast, fields) {
             return ast.value.toString();
         case 'PARENTHESES':
             return `(${generateCode(HyperFormulaLibrary, ast.expression, fields)})`;
+        case 'ERROR_WITH_RAW_INPUT'
+            return ast.rawInput;
         default:
             throw new Error(`Unknown AST node type: ${ast.type}`);
     }
