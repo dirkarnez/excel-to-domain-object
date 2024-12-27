@@ -18,6 +18,7 @@
   - [ ] `COLUMN()` get current column the current cell locates
   - [ ] `FALSE()` set cell to logical false
   - [ ] `LEFT` and `RIGHT`
+  - [ ] `IFNA()`
 - [ ] Range to fields array
 - [ ] Table references
 - [ ] PHP api JSON serializable
