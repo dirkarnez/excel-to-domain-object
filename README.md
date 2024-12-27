@@ -17,6 +17,7 @@
   - [ ] `IFERROR(value, value_if_error)`
   - [ ] `COLUMN()` get current column the current cell locates
   - [ ] `FALSE()` set cell to logical false
+  - [ ] `LEFT` and `RIGHT`
 - [ ] Range to fields array
 - [ ] Table references
 - [ ] PHP api JSON serializable
